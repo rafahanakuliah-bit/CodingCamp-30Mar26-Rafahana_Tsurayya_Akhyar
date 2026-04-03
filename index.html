@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Expense &amp; Budget Visualizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <!-- Total Balance Section -->
+  <section id="total-balance-section">
+    <h2 class="section-title">TOTAL BALANCE</h2>
+    <p id="balance-amount">Rp2.000.000</p>
+    <p id="balance-deducted">- Rp0</p>
+  </section>
+
+  <!-- Main App Grid -->
+  <div class="app-grid">
+
+    <!-- Left Column: Input + Chart -->
+    <div class="left-column">
+
+      <section id="input-section">
+        <h2 class="section-title">INPUT</h2>
+        <form id="input-form" novalidate>
+          <div class="form-group">
+            <label for="item-name">Item Name</label>
+            <div class="input-wrap">
+              <div class="input-div" id="item-name" data-name="item" data-placeholder="Item name" contenteditable="true" role="textbox" aria-label="Item Name" spellcheck="false"></div>
+              <span class="validation-msg" id="item-error"></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="amount">Amount</label>
+            <div class="input-wrap">
+              <div class="amount-wrapper">
+                <span class="rp-prefix">Rp</span>
+                <div class="input-div" id="amount" data-name="amount" data-placeholder="0" contenteditable="true" role="textbox" aria-label="Amount" inputmode="numeric" spellcheck="false"></div>
+              </div>
+              <span class="validation-msg" id="amount-error"></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <div class="input-wrap">
+              <div class="cat-dropdown" id="category-dropdown" data-name="category" role="combobox" aria-haspopup="listbox" aria-expanded="false" tabindex="0">
+                <span class="cat-dropdown-value" data-placeholder="Select Category">Select Category</span>
+                <span class="cat-dropdown-arrow">▾</span>
+                <div class="cat-dropdown-panel" role="listbox" hidden>
+                  <div class="cat-option" data-value="Food" role="option">Food</div>
+                  <div class="cat-option" data-value="Transport" role="option">Transport</div>
+                  <div class="cat-option" data-value="Fun" role="option">Fun</div>
+                  <!-- custom categories injected here by JS -->
+                  <div class="cat-add-row" id="cat-add-row-main">+ Add a New Category</div>
+                </div>
+              </div>
+              <span class="validation-msg" id="category-error"></span>
+            </div>
+          </div>
+          <div class="submit-row">
+            <button type="submit" id="submit-btn">SUBMIT</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="chart-section">
+        <h2 class="section-title">CHART</h2>
+        <div id="chart-container">
+          <canvas id="expense-chart"></canvas>
+          <p id="chart-fallback" hidden>Chart unavailable.</p>
+        </div>
+      </section>
+
+    </div><!-- /.left-column -->
+
+    <!-- Right Column: Transaction List -->
+    <div class="right-column">
+
+      <section id="transaction-list-section">
+        <h2 class="section-title">TRANSACTION LIST</h2>
+        <div class="transaction-list-header">
+          <span class="th-num">#</span>
+          <span class="th-name">Item Name</span>
+          <span class="th-amount">Amount</span>
+          <span class="th-category">Category</span>
+          <span class="th-action"></span>
+        </div>
+        <ol id="transaction-list"></ol>
+        <div id="total-expense-bar">
+          <span>TOTAL EXPENSE</span>
+          <span id="total-expense-amount">-Rp0</span>
+        </div>
+      </section>
+
+    </div><!-- /.right-column -->
+
+  </div><!-- /.app-grid -->
+
+</div><!-- /.page-wrapper -->
+
+  <!-- FAB: mobile only -->
+  <button id="add-btn" aria-label="Add transaction">+</button>
+
+  <!-- Dark mode toggle -->
+  <button id="dark-mode-btn" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
+
+  <!-- Modal Overlay -->
+  <div id="modal-overlay" aria-modal="true" role="dialog" aria-label="Add transaction" hidden>
+    <div id="modal-form-container">
+      <h2 class="section-title">INPUT</h2>
+      <form id="modal-form" novalidate>
+          <div class="form-group">
+          <label for="modal-item-name">Item Name</label>
+          <div class="input-wrap">
+            <div class="input-div" id="modal-item-name" data-name="item" data-placeholder="Item name" contenteditable="true" role="textbox" aria-label="Item Name" spellcheck="false"></div>
+            <span class="validation-msg" id="modal-item-error"></span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="modal-amount">Amount</label>
+          <div class="input-wrap">
+            <div class="amount-wrapper">
+              <span class="rp-prefix">Rp</span>
+              <div class="input-div" id="modal-amount" data-name="amount" data-placeholder="0" contenteditable="true" role="textbox" aria-label="Amount" inputmode="numeric" spellcheck="false"></div>
+            </div>
+            <span class="validation-msg" id="modal-amount-error"></span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <div class="input-wrap">
+            <div class="cat-dropdown" id="modal-category-dropdown" data-name="category" role="combobox" aria-haspopup="listbox" aria-expanded="false" tabindex="0">
+              <span class="cat-dropdown-value" data-placeholder="Select Category">Select Category</span>
+              <span class="cat-dropdown-arrow">▾</span>
+              <div class="cat-dropdown-panel" role="listbox" hidden>
+                <div class="cat-option" data-value="Food" role="option">Food</div>
+                <div class="cat-option" data-value="Transport" role="option">Transport</div>
+                <div class="cat-option" data-value="Fun" role="option">Fun</div>
+                <!-- custom categories injected here by JS -->
+                <div class="cat-add-row" id="cat-add-row-modal">+ Add a New Category</div>
+              </div>
+            </div>
+            <span class="validation-msg" id="modal-category-error"></span>
+          </div>
+        </div>
+        <div class="submit-row">
+          <button type="submit" id="modal-submit-btn">SUBMIT</button>
+        </div>
+      </form>
+    </div>
+  </div><!-- /#modal-overlay -->
+
+  <!-- Confirm Dialog -->
+  <div id="confirm-dialog" role="alertdialog" aria-modal="true" hidden>
+    <div id="confirm-dialog-box">
+      <p id="confirm-message"></p>
+      <div id="confirm-actions">
+        <button id="confirm-yes">YES</button>
+        <button id="confirm-no">NO</button>
+      </div>
+    </div>
+  </div><!-- /#confirm-dialog -->
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <!-- App -->
+  <script src="js/app.js"></script>
+
+</body>
+</html>
